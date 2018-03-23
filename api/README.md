@@ -63,3 +63,30 @@ $ docker login
 ```
 $ docker push USERNAME/person-api:1.0.0
 ```
+
+## 3 - Deployment
+
+#### 3.1 Edit the values.yaml file
+
+Edit the values.yaml file (helm-chart folder) to replace the current image repository name with the name of the docker hub repository.
+
+#### 3.2 Deploy the api in Kubernetes
+
+Make sure that you can to connect to your Kubernetes cluster by executing the command below:
+
+```
+$ kubectl cluster-info
+```
+
+Deploy the Helm chart by executing the following (`person` is an example name, replace it with the name you want to give to your api):
+
+```
+$ helm init
+$ helm upgrade --install person helm-chart/
+```
+
+Check the status and logs of the deployed pod thanks to the kubernetes dashboard:
+
+```
+$ minikube dashboard
+```

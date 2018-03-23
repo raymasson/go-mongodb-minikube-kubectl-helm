@@ -1,0 +1,39 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ template "fullname" . }}
+  labels:
+   app: {{ template "fullname" . }}
+   chart: "{{ .Chart.Name }}-{{ .Chart.Version }}"
+   release: "{{ .Release.Name }}"
+   heritage: "{{ .Release.Service }}"
+spec:
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "fullname" . }}
+    spec:
+      securityContext:
+        runAsUser: 1001
+        fsGroup: 1001
+      #imagePullSecrets:
+        #- name: dockerhub
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        env:
+        - name: DB_HOST
+          value: "mongod-0.mongodb-service.default.svc.cluster.local:27017,mongod-1.mongodb-service.default.svc.cluster.local:27017,mongod-2.mongodb-service.default.svc.cluster.local:27017"
+        - name: DB_USER
+          value: "main_admin"
+        - name: DB_PASSWORD
+          value: "abc123"
+        - name: DB_URI
+          value: "?replicaSet=MainRepSet&authSource=admin"
+        ports:
+        - name: internalport
+          containerPort: {{ .Values.service.internalPort }}
+        resources:
+{{ toYaml .Values.resources | indent 12 }}
